@@ -57,6 +57,14 @@ defmodule SnakeTest do
     assert page.metadata.before == nil
   end
 
+  test "enumerable" do
+    opts = [fields: [charged_at: :asc, id: :asc], limit: 4]
+    page = payments_by_charged_at() |> Repo.paginate(opts)
+
+    assert Enum.reduce(page, 0, fn(payment, acc) -> acc + payment.amount end)
+    assert 4 == Enum.count(page)
+  end
+
   describe "paginate a collection of payments, sorting by charged_at" do
     test "sorts ascending without cursors", %{
       payments: {p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12}

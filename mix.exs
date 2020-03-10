@@ -30,7 +30,8 @@ defmodule Ouroboros.MixProject do
       {:ecto, "~> 3.2"},
       {:ecto_sql, ">= 0.0.0", only: [:dev, :test]},
       {:postgrex, ">= 0.0.0", only: [:dev, :test]},
-      {:ex_machina, "~> 2.3", only: [:dev, :test]}
+      {:ex_machina, "~> 2.3", only: [:dev, :test]},
+      {:ex_doc, ">= 0.0.0", only: [:dev], runtime: false}
     ]
   end
 

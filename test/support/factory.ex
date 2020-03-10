@@ -1,7 +1,7 @@
-defmodule Snake.Factory do
-  use ExMachina.Ecto, repo: Snake.Repo
+defmodule Ouroboros.Factory do
+  use ExMachina.Ecto, repo: Ouroboros.Repo
 
-  alias Snake.{Customer, Address, Payment}
+  alias Ouroboros.{Customer, Address, Payment}
 
   def customer_factory do
     %Customer{

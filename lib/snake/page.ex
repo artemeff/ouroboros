@@ -1,4 +1,4 @@
-defmodule Snake.Page do
+defmodule Ouroboros.Page do
   @moduledoc """
   Defines a page.
 
@@ -17,7 +17,7 @@ defmodule Snake.Page do
   defstruct [:metadata, :entries]
 
   defimpl Enumerable do
-    def count(%Snake.Page{entries: entries}) do
+    def count(%Ouroboros.Page{entries: entries}) do
       {:ok, length(entries)}
     end
 
@@ -25,7 +25,7 @@ defmodule Snake.Page do
       {:error, __MODULE__}
     end
 
-    def reduce(%Snake.Page{entries: entries}, acc, fun) do
+    def reduce(%Ouroboros.Page{entries: entries}, acc, fun) do
       Enumerable.reduce(entries, acc, fun)
     end
 

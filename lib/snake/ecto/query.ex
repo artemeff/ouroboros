@@ -1,9 +1,9 @@
-defmodule Snake.Ecto.Query do
+defmodule Ouroboros.Ecto.Query do
   @moduledoc false
 
   import Ecto.Query
 
-  alias Snake.Config
+  alias Ouroboros.Config
 
   def paginate(query, config \\ [])
 

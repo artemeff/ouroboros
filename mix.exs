@@ -1,9 +1,9 @@
-defmodule Snake.MixProject do
+defmodule Ouroboros.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :snake,
+      app: :ouroboros,
       version: "0.1.0",
       elixir: "~> 1.10",
       elixirc_paths: elixirc_paths(Mix.env()),

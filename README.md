@@ -1,4 +1,4 @@
-# Snake
+# Ouroboros
 
 Cursor based pagination for Ecto. Thanks to [duffelhq](https://github.com/duffelhq) for the [paginator](https://github.com/duffelhq/paginator) library, from which this library grew.
 
@@ -7,7 +7,7 @@ Cursor based pagination for Ecto. Thanks to [duffelhq](https://github.com/duffel
 ```elixir
 def deps do
   [
-    {:snake, "~> 0.1.0"}
+    {:ouroboros, "~> 0.1.0"}
   ]
 end
 ```

@@ -1,14 +1,14 @@
-defmodule Snake.Address do
+defmodule Ouroboros.Address do
   use Ecto.Schema
 
   @primary_key {:city, :string, autogenerate: false}
 
   schema "addresses" do
-    belongs_to(:customer, Snake.Customer)
+    belongs_to(:customer, Ouroboros.Customer)
   end
 end
 
-defmodule Snake.Customer do
+defmodule Ouroboros.Customer do
   use Ecto.Schema
 
   import Ecto.Query
@@ -17,8 +17,8 @@ defmodule Snake.Customer do
     field(:name, :string)
     field(:active, :boolean)
 
-    has_many(:payments, Snake.Payment)
-    has_one(:address, Snake.Address)
+    has_many(:payments, Ouroboros.Payment)
+    has_one(:address, Ouroboros.Address)
 
     timestamps()
   end
@@ -28,7 +28,7 @@ defmodule Snake.Customer do
   end
 end
 
-defmodule Snake.Payment do
+defmodule Ouroboros.Payment do
   use Ecto.Schema
 
   import Ecto.Query
@@ -39,7 +39,7 @@ defmodule Snake.Payment do
     field(:description, :string)
     field(:status, :string)
 
-    belongs_to(:customer, Snake.Customer)
+    belongs_to(:customer, Ouroboros.Customer)
 
     timestamps()
   end

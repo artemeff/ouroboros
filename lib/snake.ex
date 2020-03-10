@@ -1,4 +1,4 @@
-defmodule Snake do
+defmodule Ouroboros do
   @moduledoc """
   Allows you to paginate your Ecto results using cursors.
 
@@ -6,19 +6,19 @@ defmodule Snake do
 
       defmodule MyApp.Repo do
         use Ecto.Repo, otp_app: :my_app
-        use Snake
+        use Ouroboros
       end
 
   ## Options
 
-  `Snake` can take any options accepted by `paginate/3`. This is useful when
+  `Ouroboros` can take any options accepted by `paginate/3`. This is useful when
   you want to enforce some options globally across your project.
 
   ### Example
 
       defmodule MyApp.Repo do
         use Ecto.Repo, otp_app: :my_app
-        use Snake, limit: 10, limit_max: 100,
+        use Ouroboros, limit: 10, limit_max: 100,
       end
 
   Note that these values can be still be overriden when `paginate/3` is called.
@@ -34,20 +34,20 @@ defmodule Snake do
         def my_paginate_function(query, opts \\ [], repo_opts \\ []) do
           defaults = [limit: 10] # Default options of your choice here
           opts = Keyword.merge(defaults, opts)
-          Snake.paginate(query, opts, __MODULE__, repo_opts)
+          Ouroboros.paginate(query, opts, __MODULE__, repo_opts)
         end
       end
 
   """
 
-  alias Snake.{Ecto.Query, Config, Cursor, Page, Page.Metadata}
+  alias Ouroboros.{Ecto.Query, Config, Cursor, Page, Page.Metadata}
 
   defmacro __using__(opts) do
     quote do
       @defaults unquote(opts)
 
       def paginate(query, opts \\ [], repo_opts \\ []) do
-        Snake.paginate(query, Keyword.merge(@defaults, opts), __MODULE__, repo_opts)
+        Ouroboros.paginate(query, Keyword.merge(@defaults, opts), __MODULE__, repo_opts)
       end
     end
   end
@@ -63,7 +63,7 @@ defmodule Snake do
       In most cases, this should be the same fields as the ones used for sorting in the query.
       When you use named bindings in your query they can also be provided;
     * `:value_fun` - function of arity 2 to lookup cursor values on returned records.
-      Defaults to `&Snake.value_fun_default/2`;
+      Defaults to `&Ouroboros.value_fun_default/2`;
     * `:limit` - limits the number of records returned per page. Note that this
       number will be capped by `:limit_max`. Defaults to `50`;
     * `:limit_max` - sets a maximum cap for `:limit`. This option can be useful when `:limit`
@@ -101,7 +101,7 @@ defmodule Snake do
   this case we name it `author`. In the `fields` we refer to this named binding
   and its column name.
 
-  To build the cursor Snake uses the returned Ecto.Schema. When using a joined
+  To build the cursor Ouroboros uses the returned Ecto.Schema. When using a joined
   column the returned Ecto.Schema won't have the value of the joined column
   unless we preload it. E.g. in this case the cursor will be build up from
   `post.id` and `post.author.name`. This presupposes that the named of the
@@ -128,11 +128,11 @@ defmodule Snake do
         fields: [{{:company, :name}, :asc}, id: :asc],
         value_fun: fn
           post, {{:company, name}, _} -> {:string, post.author.company.name}
-          post, field -> Snake.value_fun_default(post, field)
+          post, field -> Ouroboros.value_fun_default(post, field)
         end, limit: 50)
 
   """
-  @callback paginate(query :: Ecto.Query.t(), opts :: keyword(), repo_opts :: keyword()) :: Snake.Page.t()
+  @callback paginate(query :: Ecto.Query.t(), opts :: keyword(), repo_opts :: keyword()) :: Ouroboros.Page.t()
 
   @doc false
   def paginate(query, opts, repo, repo_opts) do
@@ -165,10 +165,10 @@ defmodule Snake do
 
   ### Example
 
-      iex> Snake.cursor_for_record(%Snake.Customer{id: 1}, [:id])
+      iex> Ouroboros.cursor_for_record(%Ouroboros.Customer{id: 1}, [:id])
       "g2sAAQE"
 
-      iex> Snake.cursor_for_record(%Snake.Customer{id: 1, name: "Alice"}, [id: :asc, name: :desc])
+      iex> Ouroboros.cursor_for_record(%Ouroboros.Customer{id: 1, name: "Alice"}, [id: :asc, name: :desc])
       "g2wAAAACYQFtAAAABUFsaWNlag"
 
   """
@@ -182,7 +182,7 @@ defmodule Snake do
 
   @doc """
   Default function used to get the value of a cursor field from the supplied
-  map. This function can be overriden in the `Snake.Config` using the `value_fun` key.
+  map. This function can be overriden in the `Ouroboros.Config` using the `value_fun` key.
 
   When using named bindings to sort on joined columns it will attempt to get
   the value of joined column by using the named binding as the name of the
@@ -190,10 +190,10 @@ defmodule Snake do
 
   ### Example
 
-      iex> Snake.value_fun_default(%Snake.Customer{id: 1}, :id)
+      iex> Ouroboros.value_fun_default(%Ouroboros.Customer{id: 1}, :id)
       {:id, 1}
 
-      iex> Snake.value_fun_default(%Snake.Customer{id: 1, address: %Snake.Address{city: "London"}}, {:address, :city})
+      iex> Ouroboros.value_fun_default(%Ouroboros.Customer{id: 1, address: %Ouroboros.Address{city: "London"}}, {:address, :city})
       {:string, "London"}
 
   """
@@ -213,7 +213,7 @@ defmodule Snake do
 
   @doc """
   Default function used to get the value of a cursor field from the supplied
-  map. This function can be overriden in the `Snake.Config` using the `value_fun` key.
+  map. This function can be overriden in the `Ouroboros.Config` using the `value_fun` key.
 
   When using named bindings to sort on joined columns it will attempt to get
   the value of joined column by using the named binding as the name of the
@@ -221,16 +221,16 @@ defmodule Snake do
 
   ### Example
 
-      iex> Snake.type_fun_default(%Snake.Customer{id: 1}, :id)
+      iex> Ouroboros.type_fun_default(%Ouroboros.Customer{id: 1}, :id)
       :id
 
-      iex> Snake.type_fun_default(%Snake.Customer{}, {:address, :city})
+      iex> Ouroboros.type_fun_default(%Ouroboros.Customer{}, {:address, :city})
       :string
 
-      iex> Snake.type_fun_default(%Snake.Customer{id: 1, address: %Snake.Address{city: "London"}}, {:address, :city})
+      iex> Ouroboros.type_fun_default(%Ouroboros.Customer{id: 1, address: %Ouroboros.Address{city: "London"}}, {:address, :city})
       :string
 
-      iex> Snake.type_fun_default(Snake.Customer, :inserted_at)
+      iex> Ouroboros.type_fun_default(Ouroboros.Customer, :inserted_at)
       :naive_datetime
 
   """

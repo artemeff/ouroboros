@@ -1,4 +1,4 @@
-defmodule Snake.Cursor do
+defmodule Ouroboros.Cursor do
   @moduledoc false
 
   def decode(_, value) when value in [nil, ""] do

@@ -1,4 +1,4 @@
-defmodule Snake.Migration do
+defmodule Ouroboros.Migration do
   use Ecto.Migration
 
   def change do

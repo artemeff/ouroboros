@@ -1,22 +1,22 @@
-defmodule Snake.Case do
+defmodule Ouroboros.Case do
   use ExUnit.CaseTemplate
 
   using do
     quote do
       import Ecto
       import Ecto.Query
-      import Snake.Factory
+      import Ouroboros.Factory
 
-      alias Snake.{Repo, Page, Page.Metadata}
-      alias Snake.{Customer, Address, Payment}
+      alias Ouroboros.{Repo, Page, Page.Metadata}
+      alias Ouroboros.{Customer, Address, Payment}
     end
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Snake.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Ouroboros.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Snake.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(Ouroboros.Repo, {:shared, self()})
     end
 
     :ok

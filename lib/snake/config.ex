@@ -1,4 +1,4 @@
-defmodule Snake.Config do
+defmodule Ouroboros.Config do
   @moduledoc false
 
   @type t :: %__MODULE__{}
@@ -23,15 +23,15 @@ defmodule Snake.Config do
     cursor_before = Keyword.get(opts, :before)
 
     fields = Keyword.get(opts, :fields, [])
-    fields_types = Enum.map(fields, fn({field, _ordering}) -> Snake.type_fun_default(struct(module), field) end)
+    fields_types = Enum.map(fields, fn({field, _ordering}) -> Ouroboros.type_fun_default(struct(module), field) end)
 
     %__MODULE__{
       after: cursor_after,
-      after_values: Snake.Cursor.decode(fields_types, cursor_after),
+      after_values: Ouroboros.Cursor.decode(fields_types, cursor_after),
       before: cursor_before,
-      before_values: Snake.Cursor.decode(fields_types, cursor_before),
+      before_values: Ouroboros.Cursor.decode(fields_types, cursor_before),
       fields: fields,
-      value_fun: Keyword.get(opts, :value_fun, &Snake.value_fun_default/2),
+      value_fun: Keyword.get(opts, :value_fun, &Ouroboros.value_fun_default/2),
       limit: limit(opts)
     }
   end

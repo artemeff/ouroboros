@@ -1,9 +1,9 @@
-defmodule SnakeTest do
-  use Snake.Case
+defmodule OuroborosTest do
+  use Ouroboros.Case
 
-  alias Snake.Cursor
+  alias Ouroboros.Cursor
 
-  doctest Snake
+  doctest Ouroboros
 
   setup :create_customers_and_payments
 
@@ -580,7 +580,7 @@ defmodule SnakeTest do
               {:string, schema.customer.address.city}
 
             schema, field ->
-              Snake.value_fun_default(schema, field)
+              Ouroboros.value_fun_default(schema, field)
           end
         )
 
@@ -641,16 +641,16 @@ defmodule SnakeTest do
   test "per-record cursor generation", %{
     payments: {p1, _p2, _p3, _p4, _p5, _p6, p7, _p8, _p9, _p10, _p11, _p12}
   } do
-    assert Snake.cursor_for_record(p1, charged_at: :asc, id: :asc) ==
+    assert Ouroboros.cursor_for_record(p1, charged_at: :asc, id: :asc) ==
              encode_cursor(p1, [:charged_at, :id])
 
-    assert Snake.cursor_for_record(p7, amount: :asc) == encode_cursor(p7, [:amount])
+    assert Ouroboros.cursor_for_record(p7, amount: :asc) == encode_cursor(p7, [:amount])
   end
 
   test "per-record cursor generation with custom cursor value function", %{
     payments: {p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10, _p11, _p12}
   } do
-    assert Snake.cursor_for_record(p1, [charged_at: :asc, id: :asc], fn schema, field ->
+    assert Ouroboros.cursor_for_record(p1, [charged_at: :asc, id: :asc], fn schema, field ->
              case field do
                :id -> {:id, Map.get(schema, :id)}
                _ -> {:string, "10"}
@@ -807,7 +807,7 @@ defmodule SnakeTest do
 
   defp encode_cursor(schema, fields) do
     # Cursor.encode(value)
-    Snake.cursor_for_record(schema, fields)
+    Ouroboros.cursor_for_record(schema, fields)
   end
 
   defp days_ago(days) do

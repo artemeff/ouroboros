@@ -1,4 +1,4 @@
-defmodule Snake.Page.Metadata do
+defmodule Ouroboros.Page.Metadata do
   @moduledoc """
   Defines page metadata.
 

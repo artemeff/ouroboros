@@ -8,13 +8,17 @@ defmodule Ouroboros.MixProject do
       elixir: "~> 1.10",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+
+      # Hex
+      description: description(),
+      package: package(),
     ]
   end
 
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: []
     ]
   end
 
@@ -27,6 +31,19 @@ defmodule Ouroboros.MixProject do
       {:ecto_sql, ">= 0.0.0", only: [:dev, :test]},
       {:postgrex, ">= 0.0.0", only: [:dev, :test]},
       {:ex_machina, "~> 2.3", only: [:dev, :test]}
+    ]
+  end
+
+  defp description do
+    "Cursor based pagination for Ecto"
+  end
+
+  defp package do
+    [
+      name: :ouroboros,
+      maintainers: ["Yuri Artemev"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/artemeff/ouroboros"}
     ]
   end
 end

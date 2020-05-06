@@ -17,6 +17,43 @@ defmodule Ouroboros.Ecto.Query do
     paginate(query, Config.new(query, opts))
   end
 
+  def count(query) do
+    query
+    |> exclude(:preload)
+    |> exclude(:order_by)
+    |> aggregate()
+  end
+
+  defp aggregate(%{distinct: %{expr: [_ | _]}} = query) do
+    query
+    |> exclude(:select)
+    |> count()
+  end
+
+  defp aggregate(
+         %{
+           group_bys: [
+             %Ecto.Query.QueryExpr{
+               expr: [
+                 {{:., [], [{:&, [], [source_index]}, field]}, [], []} | _
+               ]
+             }
+             | _
+           ]
+         } = query
+       ) do
+    query
+    |> exclude(:select)
+    |> select([{x, source_index}], struct(x, ^[field]))
+    |> count()
+  end
+
+  defp aggregate(query) do
+    query
+    |> exclude(:select)
+    |> select(count("*"))
+  end
+
   defp get_operator_for_field(fields, key, direction) do
     {_, order} = Enum.find(fields, fn({field_key, _order}) -> field_key == key end)
     get_operator(order, direction)

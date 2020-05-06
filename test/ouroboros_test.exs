@@ -71,10 +71,10 @@ defmodule OuroborosTest do
     } do
       %Page{entries: entries, metadata: metadata} =
         payments_by_charged_at()
-        |> Repo.paginate(fields: [{:charged_at, :asc}, {:id, :asc}], limit: 50)
+        |> Repo.paginate(fields: [{:charged_at, :asc}, {:id, :asc}], limit: 50, total: true)
 
       assert to_ids(entries) == to_ids([p5, p4, p1, p6, p7, p3, p10, p2, p12, p8, p9, p11])
-      assert metadata == %Metadata{after: nil, before: nil, limit: 50}
+      assert metadata == %Metadata{after: nil, before: nil, limit: 50, total: 12}
     end
 
     test "sorts ascending with before cursor", %{
@@ -85,15 +85,14 @@ defmodule OuroborosTest do
         |> Repo.paginate(
           fields: [{:charged_at, :asc}, {:id, :asc}],
           before: encode_cursor(p9, [:charged_at, :id]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([p1, p6, p7, p3, p10, p2, p12, p8])
 
       assert metadata == %Metadata{
                after: encode_cursor(p8, [:charged_at, :id]),
                before: encode_cursor(p1, [:charged_at, :id]),
-               limit: 8
+               limit: 8, total: 12
              }
     end
 
@@ -105,15 +104,14 @@ defmodule OuroborosTest do
         |> Repo.paginate(
           fields: [{:charged_at, :asc}, {:id, :asc}],
           after: encode_cursor(p3, [:charged_at, :id]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([p10, p2, p12, p8, p9, p11])
 
       assert metadata == %Metadata{
                after: nil,
                before: encode_cursor(p10, [:charged_at, :id]),
-               limit: 8
+               limit: 8, total: 12
              }
     end
 
@@ -126,15 +124,14 @@ defmodule OuroborosTest do
           fields: [{:charged_at, :asc}, {:id, :asc}],
           after: encode_cursor(p3, [:charged_at, :id]),
           before: encode_cursor(p8, [:charged_at, :id]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([p10, p2, p12])
 
       assert metadata == %Metadata{
                after: encode_cursor(p12, [:charged_at, :id]),
                before: encode_cursor(p10, [:charged_at, :id]),
-               limit: 8
+               limit: 8, total: 12
              }
     end
 
@@ -143,10 +140,10 @@ defmodule OuroborosTest do
     } do
       %Page{entries: entries, metadata: metadata} =
         payments_by_charged_at(:desc)
-        |> Repo.paginate(fields: [{:charged_at, :desc}, {:id, :desc}], limit: 50)
+        |> Repo.paginate(fields: [{:charged_at, :desc}, {:id, :desc}], limit: 50, total: true)
 
       assert to_ids(entries) == to_ids([p11, p9, p8, p12, p2, p10, p3, p7, p6, p1, p4, p5])
-      assert metadata == %Metadata{after: nil, before: nil, limit: 50}
+      assert metadata == %Metadata{after: nil, before: nil, limit: 50, total: 12}
     end
 
     test "sorts descending with before cursor", %{
@@ -157,14 +154,14 @@ defmodule OuroborosTest do
         |> Repo.paginate(
              fields: [{:charged_at, :desc}, {:id, :desc}],
              before: encode_cursor(p9, [:charged_at, :id]),
-             limit: 8)
+             limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([p11])
 
       assert metadata == %Metadata{
                after: encode_cursor(p11, [:charged_at, :id]),
                before: nil,
-               limit: 8
+               limit: 8, total: 12
              }
     end
 
@@ -176,15 +173,14 @@ defmodule OuroborosTest do
         |> Repo.paginate(
           fields: [{:charged_at, :desc}, {:id, :desc}],
           after: encode_cursor(p9, [:charged_at, :id]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([p8, p12, p2, p10, p3, p7, p6, p1])
 
       assert metadata == %Metadata{
                after: encode_cursor(p1, [:charged_at, :id]),
                before: encode_cursor(p8, [:charged_at, :id]),
-               limit: 8
+               limit: 8, total: 12
              }
     end
 
@@ -197,15 +193,14 @@ defmodule OuroborosTest do
           fields: [{:charged_at, :desc}, {:id, :desc}],
           after: encode_cursor(p9, [:charged_at, :id]),
           before: encode_cursor(p3, [:charged_at, :id]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([p8, p12, p2, p10])
 
       assert metadata == %Metadata{
                after: encode_cursor(p10, [:charged_at, :id]),
                before: encode_cursor(p8, [:charged_at, :id]),
-               limit: 8
+               limit: 8, total: 12
              }
     end
 
@@ -217,11 +212,10 @@ defmodule OuroborosTest do
         |> Repo.paginate(
           fields: [{:charged_at, :asc}, {:id, :asc}],
           before: encode_cursor(p5, [:charged_at, :id]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([])
-      assert metadata == %Metadata{after: nil, before: nil, limit: 8}
+      assert metadata == %Metadata{after: nil, before: nil, limit: 8, total: 12}
     end
 
     test "sorts ascending with after cursor at end of collection", %{
@@ -232,11 +226,10 @@ defmodule OuroborosTest do
         |> Repo.paginate(
           fields: [{:charged_at, :asc}, {:id, :asc}],
           after: encode_cursor(p11, [:charged_at, :id]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([])
-      assert metadata == %Metadata{after: nil, before: nil, limit: 8}
+      assert metadata == %Metadata{after: nil, before: nil, limit: 8, total: 12}
     end
 
     test "sorts descending with before cursor at beginning of collection", %{
@@ -247,11 +240,10 @@ defmodule OuroborosTest do
         |> Repo.paginate(
           fields: [{:charged_at, :desc}, {:id, :desc}],
           before: encode_cursor(p11, [:charged_at, :id]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([])
-      assert metadata == %Metadata{after: nil, before: nil, limit: 8}
+      assert metadata == %Metadata{after: nil, before: nil, limit: 8, total: 12}
     end
 
     test "sorts descending with after cursor at end of collection", %{
@@ -262,11 +254,10 @@ defmodule OuroborosTest do
         |> Repo.paginate(
           fields: [{:charged_at, :desc}, {:id, :desc}],
           after: encode_cursor(p5, [:charged_at, :id]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([])
-      assert metadata == %Metadata{after: nil, before: nil, limit: 8}
+      assert metadata == %Metadata{after: nil, before: nil, limit: 8, total: 12}
     end
   end
 
@@ -277,7 +268,7 @@ defmodule OuroborosTest do
     } do
       %Page{entries: entries, metadata: _metadata} =
         customer_payments_by_amount(c1)
-        |> Repo.paginate(fields: [{:amount, :asc}, {:charged_at, :asc}, {:id, :asc}], limit: 50)
+        |> Repo.paginate(fields: [{:amount, :asc}, {:charged_at, :asc}, {:id, :asc}], limit: 50, total: true)
 
       assert to_ids(entries) == to_ids([p6, p5, p7, p8])
     end
@@ -291,8 +282,7 @@ defmodule OuroborosTest do
                |> Repo.paginate(
                  fields: [{:amount, :asc}, {:charged_at, :asc}, {:id, :asc}],
                  before: encode_cursor(p6, [:amount, :charged_at, :id]),
-                 limit: 1
-               )
+                 limit: 1, total: true)
     end
   end
 
@@ -311,8 +301,7 @@ defmodule OuroborosTest do
                            {{:bogus_binding, :name}, :asc}
                          ],
                          limit: 50,
-                         before: encode_cursor(p11, [:id, {:customer, :name}])
-                       )
+                         before: encode_cursor(p11, [:id, {:customer, :name}]), total: true)
                    end
     end
 
@@ -324,15 +313,14 @@ defmodule OuroborosTest do
         |> Repo.paginate(
           fields: [{:id, :asc}, {{:customer, :name}, :asc}],
           before: encode_cursor(p11, [:id, {:customer, :name}]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([p3, p4, p5, p6, p7, p8, p9, p10])
 
       assert metadata == %Metadata{
                after: encode_cursor(p10, [:id, {:customer, :name}]),
                before: encode_cursor(p3, [:id, {:customer, :name}]),
-               limit: 8
+               limit: 8, total: 12
              }
     end
 
@@ -344,15 +332,14 @@ defmodule OuroborosTest do
         |> Repo.paginate(
           fields: [{:id, :asc}, {{:customer, :name}, :asc}],
           before: encode_cursor(p11, [:id, {:customer, :name}]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([p3, p4, p5, p6, p7, p8, p9, p10])
 
       assert metadata == %Metadata{
                after: encode_cursor(p10, [:id, {:customer, :name}]),
                before: encode_cursor(p3, [:id, {:customer, :name}]),
-               limit: 8
+               limit: 8, total: 12
              }
     end
 
@@ -363,11 +350,10 @@ defmodule OuroborosTest do
         payments_by_customer_name()
         |> Repo.paginate(
           fields: [{{:payments, :id}, :asc}, {{:customer, :name}, :asc}],
-          limit: 50
-        )
+          limit: 50, total: true)
 
       assert to_ids(entries) == to_ids([p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12])
-      assert metadata == %Metadata{after: nil, before: nil, limit: 50}
+      assert metadata == %Metadata{after: nil, before: nil, limit: 50, total: 12}
     end
 
     test "sorts ascending with before cursor", %{
@@ -378,15 +364,14 @@ defmodule OuroborosTest do
         |> Repo.paginate(
           fields: [{{:payments, :id}, :asc}, {{:customer, :name}, :asc}],
           before: encode_cursor(p11, [:id, {:customer, :name}]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([p3, p4, p5, p6, p7, p8, p9, p10])
 
       assert metadata == %Metadata{
                after: encode_cursor(p10, [:id, {:customer, :name}]),
                before: encode_cursor(p3, [:id, {:customer, :name}]),
-               limit: 8
+               limit: 8, total: 12
              }
     end
 
@@ -398,15 +383,14 @@ defmodule OuroborosTest do
         |> Repo.paginate(
           fields: [{{:payments, :id}, :asc}, {{:customer, :name}, :asc}],
           after: encode_cursor(p6, [:id, {:customer, :name}]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([p7, p8, p9, p10, p11, p12])
 
       assert metadata == %Metadata{
                after: nil,
                before: encode_cursor(p7, [:id, {:customer, :name}]),
-               limit: 8
+               limit: 8, total: 12
              }
     end
 
@@ -419,15 +403,14 @@ defmodule OuroborosTest do
           fields: [{{:payments, :id}, :asc}, {{:customer, :name}, :asc}],
           after: encode_cursor(p6, [:id, {:customer, :name}]),
           before: encode_cursor(p10, [:id, {:customer, :name}]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([p7, p8, p9])
 
       assert metadata == %Metadata{
                after: encode_cursor(p9, [:id, {:customer, :name}]),
                before: encode_cursor(p7, [:id, {:customer, :name}]),
-               limit: 8
+               limit: 8, total: 12
              }
     end
 
@@ -438,11 +421,10 @@ defmodule OuroborosTest do
         payments_by_customer_name(:desc, :desc)
         |> Repo.paginate(
           fields: [{{:payments, :id}, :desc}, {{:customer, :name}, :desc}],
-          limit: 50
-        )
+          limit: 50, total: true)
 
       assert to_ids(entries) == to_ids([p12, p11, p10, p9, p8, p7, p6, p5, p4, p3, p2, p1])
-      assert metadata == %Metadata{after: nil, before: nil, limit: 50}
+      assert metadata == %Metadata{after: nil, before: nil, limit: 50, total: 12}
     end
 
     test "sorts descending with before cursor", %{
@@ -453,15 +435,14 @@ defmodule OuroborosTest do
         |> Repo.paginate(
           fields: [{{:payments, :id}, :desc}, {{:customer, :name}, :desc}],
           before: encode_cursor(p11, [:id, {:customer, :name}]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([p12])
 
       assert metadata == %Metadata{
                after: encode_cursor(p12, [:id, {:customer, :name}]),
                before: nil,
-               limit: 8
+               limit: 8, total: 12
              }
     end
 
@@ -473,15 +454,14 @@ defmodule OuroborosTest do
         |> Repo.paginate(
           fields: [{{:payments, :id}, :desc}, {{:customer, :name}, :desc}],
           after: encode_cursor(p11, [:id, {:customer, :name}]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([p10, p9, p8, p7, p6, p5, p4, p3])
 
       assert metadata == %Metadata{
                after: encode_cursor(p3, [:id, {:customer, :name}]),
                before: encode_cursor(p10, [:id, {:customer, :name}]),
-               limit: 8
+               limit: 8, total: 12
              }
     end
 
@@ -494,15 +474,14 @@ defmodule OuroborosTest do
           fields: [{{:payments, :id}, :desc}, {{:customer, :name}, :desc}],
           after: encode_cursor(p11, [:id, {:customer, :name}]),
           before: encode_cursor(p6, [:id, {:customer, :name}]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([p10, p9, p8, p7])
 
       assert metadata == %Metadata{
                after: encode_cursor(p7, [:id, {:customer, :name}]),
                before: encode_cursor(p10, [:id, {:customer, :name}]),
-               limit: 8
+               limit: 8, total: 12
              }
     end
 
@@ -514,11 +493,10 @@ defmodule OuroborosTest do
         |> Repo.paginate(
           fields: [{{:payments, :id}, :asc}, {{:customer, :name}, :asc}],
           before: encode_cursor(p1, [:id, {:customer, :name}]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([])
-      assert metadata == %Metadata{after: nil, before: nil, limit: 8}
+      assert metadata == %Metadata{after: nil, before: nil, limit: 8, total: 12}
     end
 
     test "sorts ascending with after cursor at end of collection", %{
@@ -529,11 +507,10 @@ defmodule OuroborosTest do
         |> Repo.paginate(
           fields: [{{:payments, :id}, :asc}, {{:customer, :name}, :asc}],
           after: encode_cursor(p12, [:id, {:customer, :name}]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([])
-      assert metadata == %Metadata{after: nil, before: nil, limit: 8}
+      assert metadata == %Metadata{after: nil, before: nil, limit: 8, total: 12}
     end
 
     test "sorts descending with before cursor at beginning of collection", %{
@@ -544,11 +521,10 @@ defmodule OuroborosTest do
         |> Repo.paginate(
           fields: [{{:payments, :id}, :desc}, {{:customer, :name}, :desc}],
           before: encode_cursor(p12, [:id, {:customer, :name}]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([])
-      assert metadata == %Metadata{after: nil, before: nil, limit: 8}
+      assert metadata == %Metadata{after: nil, before: nil, limit: 8, total: 12}
     end
 
     test "sorts descending with after cursor at end of collection", %{
@@ -559,11 +535,10 @@ defmodule OuroborosTest do
         |> Repo.paginate(
           fields: [{{:payments, :id}, :desc}, {{:customer, :name}, :desc}],
           after: encode_cursor(p1, [:id, {:customer, :name}]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert to_ids(entries) == to_ids([])
-      assert metadata == %Metadata{after: nil, before: nil, limit: 8}
+      assert metadata == %Metadata{after: nil, before: nil, limit: 8, total: 12}
     end
 
     test "sorts on 2nd level join column with a custom cursor value function", %{
@@ -575,6 +550,7 @@ defmodule OuroborosTest do
           fields: [{{:address, :city}, :asc}, id: :asc],
           before: nil,
           limit: 3,
+          total: true,
           value_fun: fn
             schema, {:address, :city} ->
               {:string, schema.customer.address.city}
@@ -591,7 +567,7 @@ defmodule OuroborosTest do
       assert metadata == %Metadata{
                after: Cursor.encode([{:string, p7.customer.address.city}, {:id, p7.id}]),
                before: nil,
-               limit: 3
+               limit: 3, total: 12
              }
     end
 
@@ -603,14 +579,13 @@ defmodule OuroborosTest do
         |> Repo.paginate(
           fields: [{:charged_at, :desc}, {:id, :desc}],
           after: Cursor.encode([{:utc_datetime, nil}, {:id, nil}]),
-          limit: 8
-        )
+          limit: 8, total: true)
 
       assert Enum.count(entries) == 8
 
       assert metadata == %Metadata{
                before: encode_cursor(p11, [:charged_at, :id]),
-               limit: 8,
+               limit: 8, total: 12,
                after: encode_cursor(p7, [:charged_at, :id])
              }
     end
@@ -625,6 +600,28 @@ defmodule OuroborosTest do
 
     assert to_ids(entries) == to_ids([p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12])
     assert metadata == %Metadata{after: nil, before: nil, limit: 50}
+  end
+
+  test "returns total", %{
+    payments: {p1, p2, p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10, _p11, _p12}
+  } do
+    %Page{entries: entries, metadata: metadata} =
+      payments_by_customer_name()
+      |> Repo.paginate(fields: [{:id, :asc}], limit: 3, total: true)
+
+    assert to_ids(entries) == to_ids([p1, p2, p3])
+    assert metadata == %Metadata{after: encode_cursor(p3, [:id]), before: nil, limit: 3, total: 12}
+  end
+
+  test "returns total with filtering", %{
+    payments: {_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, p9, p10, p11, _p12}
+  } do
+    %Page{entries: entries, metadata: metadata} =
+      payments_by_address_city_name("Tokyo")
+      |> Repo.paginate(fields: [{:id, :asc}], limit: 3, total: true)
+
+    assert to_ids(entries) == to_ids([p9, p10, p11])
+    assert metadata == %Metadata{after: encode_cursor(p11, [:id]), before: nil, limit: 3, total: 4}
   end
 
   test "enforces the minimum limit", %{
@@ -796,6 +793,19 @@ defmodule OuroborosTest do
       order_by: [
         {^address_city_direction, a.city},
         {^payment_id_direction, p.id}
+      ]
+  end
+
+  defp payments_by_address_city_name(city) do
+    from p in Payment, as: :payments,
+      join: c in assoc(p, :customer), as: :customer,
+      join: a in assoc(c, :address), as: :address,
+      preload: [customer: {c, address: a}],
+      select: p,
+      where: a.city == ^city,
+      order_by: [
+        {:asc, a.city},
+        {:asc, p.id}
       ]
   end
 

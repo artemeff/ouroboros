@@ -11,7 +11,8 @@ defmodule Ouroboros.Config do
     :fields,
     :value_fun,
     :limit,
-    :limit_max
+    :limit_max,
+    :total,
   ]
 
   @limit_default 50
@@ -32,7 +33,8 @@ defmodule Ouroboros.Config do
       before_values: Ouroboros.Cursor.decode(fields_types, cursor_before),
       fields: fields,
       value_fun: Keyword.get(opts, :value_fun, &Ouroboros.value_fun_default/2),
-      limit: limit(opts)
+      limit: limit(opts),
+      total: Keyword.get(opts, :total, false),
     }
   end
 

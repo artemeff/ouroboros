@@ -143,7 +143,7 @@ defmodule Ouroboros do
         "expected `:fields` to be set in call to paginate/4"
     end
 
-    sorted_entries = entries(query, config, repo, repo_opts)
+    sorted_entries = repo.all(Query.paginate(query, config), repo_opts)
     paginated_entries = paginate_entries(sorted_entries, config)
 
     %Page{
@@ -151,7 +151,8 @@ defmodule Ouroboros do
       metadata: %Metadata{
         before: before_cursor(paginated_entries, sorted_entries, config),
         after: after_cursor(paginated_entries, sorted_entries, config),
-        limit: config.limit
+        limit: config.limit,
+        total: maybe_query_total(repo, repo_opts, query, config)
       }
     }
   end
@@ -259,10 +260,12 @@ defmodule Ouroboros do
     module.__schema__(:type, field)
   end
 
-  defp entries(query, config, repo, repo_opts) do
-    query
-    |> Query.paginate(config)
-    |> repo.all(repo_opts)
+  defp maybe_query_total(repo, repo_opts, query, %Config{total: true}) do
+    repo.one(Query.count(query), repo_opts)
+  end
+
+  defp maybe_query_total(_repo, _repo_opts, _query, %Config{}) do
+    nil
   end
 
   defp paginate_entries(sorted_entries, %Config{before: before, after: nil, limit: limit}) when not is_nil(before) do

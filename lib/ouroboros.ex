@@ -143,8 +143,15 @@ defmodule Ouroboros do
         "expected `:fields` to be set in call to paginate/4"
     end
 
-    sorted_entries = repo.all(Query.paginate(query, config), repo_opts)
-    paginated_entries = paginate_entries(sorted_entries, config)
+    {sorted_entries, paginated_entries} =
+      if config.limit == 0 do
+        {[], []}
+      else
+        sorted_entries = repo.all(Query.paginate(query, config), repo_opts)
+        paginated_entries = paginate_entries(sorted_entries, config)
+
+        {sorted_entries, paginated_entries}
+      end
 
     %Page{
       entries: paginated_entries,

@@ -16,7 +16,7 @@ defmodule Ouroboros.Config do
   ]
 
   @limit_default 50
-  @limit_min 1
+  @limit_min 0
   @limit_max 100
 
   def new(%Ecto.Query{from: %Ecto.Query.FromExpr{source: {_, module}}}, opts \\ []) do

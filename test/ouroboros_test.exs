@@ -613,6 +613,17 @@ defmodule OuroborosTest do
     assert metadata == %Metadata{after: encode_cursor(p3, [:id]), before: nil, limit: 3, total: 12}
   end
 
+  test "returns total with limit=0", %{
+    payments: {_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10, _p11, _p12}
+  } do
+    %Page{entries: entries, metadata: metadata} =
+      payments_by_customer_name()
+      |> Repo.paginate(fields: [{:id, :asc}], limit: 0, total: true)
+
+    assert to_ids(entries) == []
+    assert metadata == %Metadata{after: nil, before: nil, limit: 0, total: 12}
+  end
+
   test "returns total with filtering", %{
     payments: {_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, p9, p10, p11, _p12}
   } do
@@ -622,17 +633,6 @@ defmodule OuroborosTest do
 
     assert to_ids(entries) == to_ids([p9, p10, p11])
     assert metadata == %Metadata{after: encode_cursor(p11, [:id]), before: nil, limit: 3, total: 4}
-  end
-
-  test "enforces the minimum limit", %{
-    payments: {p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10, _p11, _p12}
-  } do
-    %Page{entries: entries, metadata: metadata} =
-      payments_by_customer_name()
-      |> Repo.paginate(fields: [{:id, :asc}], limit: 0)
-
-    assert to_ids(entries) == to_ids([p1])
-    assert metadata == %Metadata{after: encode_cursor(p1, [:id]), before: nil, limit: 1}
   end
 
   test "per-record cursor generation", %{

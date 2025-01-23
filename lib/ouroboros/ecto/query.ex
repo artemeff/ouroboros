@@ -92,7 +92,7 @@ defmodule Ouroboros.Ecto.Query do
   defp filter_values(query, fields, values, cursor_direction) do
     sorts =
       fields
-      |> Keyword.keys()
+      |> Enum.map(&elem(&1, 0))
       |> Enum.zip(values)
       |> Enum.reject(fn val -> match?({_column, nil}, val) end)
 

@@ -89,7 +89,7 @@ defmodule Ouroboros do
 
   ## Example with sorting on columns in joined tables
 
-      from p in Post, as: :posts,
+      from p in Post,
         join: a in assoc(p, :author), as: :author,
         preload: [author: a],
         select: p,
@@ -114,7 +114,7 @@ defmodule Ouroboros do
 
   ## Example
 
-      from p in Post, as: :posts,
+      from p in Post,
         join: a in assoc(p, :author), as: :author,
         join: c in assoc(a, :company), as: :company,
         preload: [author: a],
@@ -208,11 +208,7 @@ defmodule Ouroboros do
 
   @spec value_fun_default(map(), atom() | {atom(), atom()}) :: term()
   def value_fun_default(schema, {binding, field}) when is_atom(binding) and is_atom(field) do
-    if Map.has_key?(schema, field) do
-      value_fun_default(schema, field)
-    else
-      value_fun_default(Map.get(schema, binding), field)
-    end
+    {type_fun_default(schema, {binding, field}), schema |> Map.get(binding) |> Map.get(field)}
   end
 
   def value_fun_default(schema, field) when is_atom(field) do
@@ -239,7 +235,7 @@ defmodule Ouroboros do
       :string
 
       iex> Ouroboros.type_fun_default(Ouroboros.Customer, :inserted_at)
-      :naive_datetime
+      :utc_datetime_usec
 
   """
 
@@ -248,11 +244,7 @@ defmodule Ouroboros do
   end
 
   def type_fun_default(%_{} = schema, {binding, field}) when is_atom(binding) and is_atom(field) do
-    if Map.has_key?(schema, field) do
-      type_fun_default(schema, field)
-    else
-      type_fun_default(Map.get(schema, binding), field)
-    end
+    type_fun_default(Map.get(schema, binding), field)
   end
 
   def type_fun_default(%Ecto.Association.NotLoaded{__owner__: module, __field__: binding}, field) do

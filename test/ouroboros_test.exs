@@ -291,7 +291,7 @@ defmodule OuroborosTest do
       payments: {_p1, _p2, _p3, _p4, _p5, _p6, _p7, _p8, _p9, _p10, p11, _p12}
     } do
       assert_raise ArgumentError,
-                   "Could not find binding `bogus_binding` in query aliases: %{customer: 1, payments: 0}",
+                   "Could not find binding `bogus_binding` in query aliases: %{customer: 1}",
                    fn ->
                      %Page{} =
                        payments_by_customer_name()
@@ -362,7 +362,7 @@ defmodule OuroborosTest do
       %Page{entries: entries, metadata: metadata} =
         payments_by_customer_name()
         |> Repo.paginate(
-          fields: [{{:payments, :id}, :asc}, {{:customer, :name}, :asc}],
+          fields: [{:id, :asc}, {{:customer, :name}, :asc}],
           before: encode_cursor(p11, [:id, {:customer, :name}]),
           limit: 8, total: true)
 
@@ -381,7 +381,7 @@ defmodule OuroborosTest do
       %Page{entries: entries, metadata: metadata} =
         payments_by_customer_name()
         |> Repo.paginate(
-          fields: [{{:payments, :id}, :asc}, {{:customer, :name}, :asc}],
+          fields: [{:id, :asc}, {{:customer, :name}, :asc}],
           after: encode_cursor(p6, [:id, {:customer, :name}]),
           limit: 8, total: true)
 
@@ -400,7 +400,7 @@ defmodule OuroborosTest do
       %Page{entries: entries, metadata: metadata} =
         payments_by_customer_name()
         |> Repo.paginate(
-          fields: [{{:payments, :id}, :asc}, {{:customer, :name}, :asc}],
+          fields: [{:id, :asc}, {{:customer, :name}, :asc}],
           after: encode_cursor(p6, [:id, {:customer, :name}]),
           before: encode_cursor(p10, [:id, {:customer, :name}]),
           limit: 8, total: true)
@@ -433,7 +433,7 @@ defmodule OuroborosTest do
       %Page{entries: entries, metadata: metadata} =
         payments_by_customer_name(:desc)
         |> Repo.paginate(
-          fields: [{{:payments, :id}, :desc}, {{:customer, :name}, :desc}],
+          fields: [{:id, :desc}, {{:customer, :name}, :desc}],
           before: encode_cursor(p11, [:id, {:customer, :name}]),
           limit: 8, total: true)
 
@@ -452,7 +452,7 @@ defmodule OuroborosTest do
       %Page{entries: entries, metadata: metadata} =
         payments_by_customer_name(:desc, :desc)
         |> Repo.paginate(
-          fields: [{{:payments, :id}, :desc}, {{:customer, :name}, :desc}],
+          fields: [{:id, :desc}, {{:customer, :name}, :desc}],
           after: encode_cursor(p11, [:id, {:customer, :name}]),
           limit: 8, total: true)
 
@@ -471,7 +471,7 @@ defmodule OuroborosTest do
       %Page{entries: entries, metadata: metadata} =
         payments_by_customer_name(:desc, :desc)
         |> Repo.paginate(
-          fields: [{{:payments, :id}, :desc}, {{:customer, :name}, :desc}],
+          fields: [{:id, :desc}, {{:customer, :name}, :desc}],
           after: encode_cursor(p11, [:id, {:customer, :name}]),
           before: encode_cursor(p6, [:id, {:customer, :name}]),
           limit: 8, total: true)
@@ -491,7 +491,7 @@ defmodule OuroborosTest do
       %Page{entries: entries, metadata: metadata} =
         payments_by_customer_name()
         |> Repo.paginate(
-          fields: [{{:payments, :id}, :asc}, {{:customer, :name}, :asc}],
+          fields: [{:id, :asc}, {{:customer, :name}, :asc}],
           before: encode_cursor(p1, [:id, {:customer, :name}]),
           limit: 8, total: true)
 
@@ -505,7 +505,7 @@ defmodule OuroborosTest do
       %Page{entries: entries, metadata: metadata} =
         payments_by_customer_name()
         |> Repo.paginate(
-          fields: [{{:payments, :id}, :asc}, {{:customer, :name}, :asc}],
+          fields: [{:id, :asc}, {{:customer, :name}, :asc}],
           after: encode_cursor(p12, [:id, {:customer, :name}]),
           limit: 8, total: true)
 
@@ -519,7 +519,7 @@ defmodule OuroborosTest do
       %Page{entries: entries, metadata: metadata} =
         payments_by_customer_name(:desc, :desc)
         |> Repo.paginate(
-          fields: [{{:payments, :id}, :desc}, {{:customer, :name}, :desc}],
+          fields: [{:id, :desc}, {{:customer, :name}, :desc}],
           before: encode_cursor(p12, [:id, {:customer, :name}]),
           limit: 8, total: true)
 
@@ -533,7 +533,7 @@ defmodule OuroborosTest do
       %Page{entries: entries, metadata: metadata} =
         payments_by_customer_name(:desc, :desc)
         |> Repo.paginate(
-          fields: [{{:payments, :id}, :desc}, {{:customer, :name}, :desc}],
+          fields: [{:id, :desc}, {{:customer, :name}, :desc}],
           after: encode_cursor(p1, [:id, {:customer, :name}]),
           limit: 8, total: true)
 
@@ -588,6 +588,34 @@ defmodule OuroborosTest do
                limit: 8, total: 12,
                after: encode_cursor(p7, [:charged_at, :id])
              }
+    end
+
+    test "sorts with model and association have same column name", %{
+      payments: {p1, p2, p3, p4, p5, p6, p7, p8, _p9, _p10, _p11, _p12}
+    } do
+      %Page{entries: entries, metadata: metadata} =
+        payments_by_multiple_inserted_at()
+        |> Repo.paginate(
+          fields: [{:inserted_at, :asc}, {{:customer, :inserted_at}, :asc}],
+          limit: 8
+        )
+
+      assert to_ids(entries) == to_ids([p1, p2, p3, p4, p5, p6, p7, p8])
+
+      cursor = encode_cursor(p8, [:inserted_at, {:customer, :inserted_at}])
+
+      payment_inserted_at = p8.inserted_at
+      customer_inserted_at = p8.customer.inserted_at
+
+      assert [
+        ^payment_inserted_at, ^customer_inserted_at
+      ] = Ouroboros.Cursor.decode([:utc_datetime_usec, :utc_datetime_usec], cursor)
+
+      assert metadata == %Metadata{
+         after: cursor,
+         before: nil,
+         limit: 8
+       }
     end
   end
 
@@ -774,7 +802,7 @@ defmodule OuroborosTest do
   end
 
   defp payments_by_customer_name(payment_id_direction \\ :asc, customer_name_direction \\ :asc) do
-    from p in Payment, as: :payments,
+    from p in Payment,
       join: c in assoc(p, :customer), as: :customer,
       preload: [customer: c],
       select: p,
@@ -785,7 +813,7 @@ defmodule OuroborosTest do
   end
 
   defp payments_by_address_city(payment_id_direction \\ :asc, address_city_direction \\ :asc) do
-    from p in Payment, as: :payments,
+    from p in Payment,
       join: c in assoc(p, :customer), as: :customer,
       join: a in assoc(c, :address), as: :address,
       preload: [customer: {c, address: a}],
@@ -797,7 +825,7 @@ defmodule OuroborosTest do
   end
 
   defp payments_by_address_city_name(city) do
-    from p in Payment, as: :payments,
+    from p in Payment,
       join: c in assoc(p, :customer), as: :customer,
       join: a in assoc(c, :address), as: :address,
       preload: [customer: {c, address: a}],
@@ -806,6 +834,18 @@ defmodule OuroborosTest do
       order_by: [
         {:asc, a.city},
         {:asc, p.id}
+      ]
+  end
+
+  defp payments_by_multiple_inserted_at do
+    from p in Payment,
+      join: c in assoc(p, :customer), as: :customer,
+      join: a in assoc(c, :address), as: :address,
+      preload: [customer: {c, address: a}],
+      select: p,
+      order_by: [
+        {:asc, p.inserted_at},
+        {:asc, c.inserted_at}
       ]
   end
 

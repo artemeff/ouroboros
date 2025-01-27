@@ -6,7 +6,7 @@ defmodule Ouroboros.Migration do
       add(:name, :string)
       add(:active, :boolean)
 
-      timestamps()
+      timestamps(type: :utc_datetime_usec)
     end
 
     create table(:payments) do
@@ -17,7 +17,7 @@ defmodule Ouroboros.Migration do
 
       add(:customer_id, references(:customers))
 
-      timestamps()
+      timestamps(type: :utc_datetime_usec)
     end
 
     create table(:addresses, primary_key: false) do

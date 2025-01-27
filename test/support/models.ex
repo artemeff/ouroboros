@@ -20,7 +20,7 @@ defmodule Ouroboros.Customer do
     has_many(:payments, Ouroboros.Payment)
     has_one(:address, Ouroboros.Address)
 
-    timestamps()
+    timestamps(type: :utc_datetime_usec)
   end
 
   def active(query) do
@@ -41,7 +41,7 @@ defmodule Ouroboros.Payment do
 
     belongs_to(:customer, Ouroboros.Customer)
 
-    timestamps()
+    timestamps(type: :utc_datetime_usec)
   end
 
   def successful(query) do

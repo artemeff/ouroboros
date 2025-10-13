@@ -12,7 +12,7 @@ defmodule Ouroboros.Config do
     :value_fun,
     :limit,
     :limit_max,
-    :total,
+    :total
   ]
 
   @limit_default 50
@@ -24,7 +24,11 @@ defmodule Ouroboros.Config do
     cursor_before = Keyword.get(opts, :before)
 
     fields = Keyword.get(opts, :fields, [])
-    fields_types = Enum.map(fields, fn({field, _ordering}) -> Ouroboros.type_fun_default(struct(module), field) end)
+
+    fields_types =
+      Enum.map(fields, fn {field, _ordering} ->
+        Ouroboros.type_fun_default(struct(module), field)
+      end)
 
     %__MODULE__{
       after: cursor_after,
@@ -34,7 +38,7 @@ defmodule Ouroboros.Config do
       fields: fields,
       value_fun: Keyword.get(opts, :value_fun, &Ouroboros.value_fun_default/2),
       limit: limit(opts),
-      total: Keyword.get(opts, :total, false),
+      total: Keyword.get(opts, :total, false)
     }
   end
 

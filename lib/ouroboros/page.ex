@@ -10,9 +10,9 @@ defmodule Ouroboros.Page do
   """
 
   @type t :: %__MODULE__{
-    entries: [any()] | [],
-    metadata: Paginator.Page.Metadata.t()
-  }
+          entries: [any()] | [],
+          metadata: Paginator.Page.Metadata.t()
+        }
 
   defstruct [:metadata, :entries]
 

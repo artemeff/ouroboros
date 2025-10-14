@@ -12,7 +12,7 @@ defmodule Ouroboros.MixProject do
 
       # Hex
       description: description(),
-      package: package(),
+      package: package()
     ]
   end
 

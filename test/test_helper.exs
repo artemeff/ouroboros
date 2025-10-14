@@ -1,7 +1,7 @@
 Application.ensure_all_started(:postgrex)
 Application.ensure_all_started(:ecto)
 
-Logger.configure(level: :warn)
+Logger.configure(level: :warning)
 
 # Load up the repository, start it, and run migrations
 _ = Ecto.Adapters.Postgres.storage_down(Ouroboros.Repo.config())

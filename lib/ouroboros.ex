@@ -132,15 +132,16 @@ defmodule Ouroboros do
         end, limit: 50)
 
   """
-  @callback paginate(query :: Ecto.Query.t(), opts :: keyword(), repo_opts :: keyword()) :: Ouroboros.Page.t()
+  @callback paginate(query :: Ecto.Query.t(), opts :: keyword(), repo_opts :: keyword()) ::
+              Ouroboros.Page.t()
 
   @doc false
   def paginate(query, opts, repo, repo_opts) do
     config = Config.new(query, opts)
 
-    unless config.fields do
+    if !config.fields do
       raise ArgumentError,
-        "expected `:fields` to be set in call to paginate/4"
+            "expected `:fields` to be set in call to paginate/4"
     end
 
     {sorted_entries, paginated_entries} =
@@ -243,7 +244,8 @@ defmodule Ouroboros do
     nil
   end
 
-  def type_fun_default(%_{} = schema, {binding, field}) when is_atom(binding) and is_atom(field) do
+  def type_fun_default(%_{} = schema, {binding, field})
+      when is_atom(binding) and is_atom(field) do
     type_fun_default(Map.get(schema, binding), field)
   end
 
@@ -267,7 +269,8 @@ defmodule Ouroboros do
     nil
   end
 
-  defp paginate_entries(sorted_entries, %Config{before: before, after: nil, limit: limit}) when not is_nil(before) do
+  defp paginate_entries(sorted_entries, %Config{before: before, after: nil, limit: limit})
+       when not is_nil(before) do
     sorted_entries
     |> Enum.take(limit)
     |> Enum.reverse()
@@ -285,7 +288,8 @@ defmodule Ouroboros do
     nil
   end
 
-  defp before_cursor(paginated_entries, _sorted_entries, %Config{after: cafter} = config) when not is_nil(cafter) do
+  defp before_cursor(paginated_entries, _sorted_entries, %Config{after: cafter} = config)
+       when not is_nil(cafter) do
     first_or_nil(paginated_entries, config)
   end
 
@@ -309,7 +313,8 @@ defmodule Ouroboros do
     nil
   end
 
-  defp after_cursor(paginated_entries, _sorted_entries, %Config{before: before} = config) when not is_nil(before) do
+  defp after_cursor(paginated_entries, _sorted_entries, %Config{before: before} = config)
+       when not is_nil(before) do
     last_or_nil(paginated_entries, config)
   end
 
@@ -332,9 +337,9 @@ defmodule Ouroboros do
   defp fetch_cursor_value(schema, %Config{fields: fields, value_fun: value_fun}) do
     fields
     |> Enum.map(fn
-         ({field, order}) when order in [:asc, :desc] -> value_fun.(schema, field)
-         (field) -> value_fun.(schema, field)
-       end)
+      {field, order} when order in [:asc, :desc] -> value_fun.(schema, field)
+      field -> value_fun.(schema, field)
+    end)
     |> Cursor.encode()
   end
 

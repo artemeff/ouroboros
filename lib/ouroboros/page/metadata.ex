@@ -12,11 +12,11 @@ defmodule Ouroboros.Page.Metadata do
   """
 
   @type t :: %__MODULE__{
-    after: binary(),
-    before: binary(),
-    limit: non_neg_integer(),
-    total: integer() | nil,
-  }
+          after: binary(),
+          before: binary(),
+          limit: non_neg_integer(),
+          total: integer() | nil
+        }
 
   defstruct [:after, :before, :limit, :total]
 end

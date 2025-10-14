@@ -55,7 +55,7 @@ defmodule Ouroboros.Ecto.Query do
   end
 
   defp get_operator_for_field(fields, key, direction) do
-    {_, order} = Enum.find(fields, fn({field_key, _order}) -> field_key == key end)
+    {_, order} = Enum.find(fields, fn {field_key, _order} -> field_key == key end)
     get_operator(order, direction)
   end
 
@@ -83,7 +83,11 @@ defmodule Ouroboros.Ecto.Query do
     |> reverse_order_bys()
   end
 
-  defp maybe_where(query, %Config{after_values: after_values, before_values: before_values, fields: fields}) do
+  defp maybe_where(query, %Config{
+         after_values: after_values,
+         before_values: before_values,
+         fields: fields
+       }) do
     query
     |> filter_values(fields, after_values, :after)
     |> filter_values(fields, before_values, :before)
@@ -128,7 +132,6 @@ defmodule Ouroboros.Ecto.Query do
     where(query, [{q, 0}], ^dynamic_sorts)
   end
 
-
   defp column_position(query, {binding_name, column}) do
     case Map.fetch(query.aliases, binding_name) do
       {:ok, position} ->
@@ -136,7 +139,7 @@ defmodule Ouroboros.Ecto.Query do
 
       _ ->
         raise ArgumentError,
-          "Could not find binding `#{binding_name}` in query aliases: #{inspect(query.aliases)}"
+              "Could not find binding `#{binding_name}` in query aliases: #{inspect(query.aliases)}"
     end
   end
 
